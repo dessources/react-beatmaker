@@ -1,80 +1,75 @@
-// Welcome to the React Beatmaker Workshop!
-//
-// In this starter step, the entire UI is rendered as static JSX.
-//
-// TODO (Step 1):
-// 1. Complete `src/components/Pad.jsx` and `src/components/Track.jsx`.
-// 2. Use `useState` to manage the 8 pads for each track (kick, snare, hihat).
-// 3. Write a `togglePad(track, index)` function to toggle a pad's active state on click.
-// 4. Replace the hardcoded track markup below with three `<Track />` components!
+import { useState } from "react";
+import Track from "./components/Track";
 
-const PADS = [0, 1, 2, 3, 4, 5, 6, 7];
+const KICK_OPTIONS = [
+  { value: "./sounds/kick-classic.wav", label: "Classic Kick" },
+  { value: "./sounds/kick-808.wav", label: "808 Kick" },
+  { value: "./sounds/kick-heavy.wav", label: "Kick Heavy" },
+  { value: "./sounds/kick-softy.wav", label: "Kick Softy" },
+];
+
+const SNARE_OPTIONS = [
+  { value: "./sounds/snare-acoustic01.wav", label: "Classic Snare" },
+  { value: "./sounds/snare-808.wav", label: "808 Snare" },
+  { value: "./sounds/snare-vinyl02.wav", label: "Snare Vinyl" },
+];
+
+const HIHAT_OPTIONS = [
+  { value: "./sounds/hihat-acoustic01.wav", label: "Hihat Acoustic" },
+  { value: "./sounds/hihat-808.wav", label: "808 Hihat" },
+];
 
 function App() {
+  const [kickPads, setKickPads] = useState(() => Array(8).fill(false));
+  const [snarePads, setSnarePads] = useState(() => Array(8).fill(false));
+  const [hihatPads, setHihatPads] = useState(() => Array(8).fill(false));
+
+  // TODO (Step 2): Add state for selected sounds (kickSound, snareSound, hihatSound)
+  // TODO (Step 2): Add state for muted tracks (`[false, false, false]`)
+  // TODO (Step 2): Create `useRef`s for the three <audio> elements (kickAudioRef, snareAudioRef, hihatAudioRef)
+
+  const togglePad = (track, index) => {
+    if (track === "kick") {
+      setKickPads((prev) => prev.map((val, i) => (i === index ? !val : val)));
+    } else if (track === "snare") {
+      setSnarePads((prev) => prev.map((val, i) => (i === index ? !val : val)));
+    } else if (track === "hihat") {
+      setHihatPads((prev) => prev.map((val, i) => (i === index ? !val : val)));
+    }
+  };
+
+  // TODO (Step 2): Write `handleMute(trackIndex)` to toggle track mute state and set `audioRef.current.volume` (0 or 1)
+  // TODO (Step 2): Write `handleChangeSound(e)` to update the selected sound state when a <select> changes
+
   return (
     <>
       <div className="sequencer">
-        {/* TODO (Step 1): Replace these three track divs with reusable <Track /> components */}
-        <div className="kick-track">
-          <div className="controls">
-            <h1>Kick</h1>
-            <button data-track="0" className="mute kick-volume">
-              <i className="fas fa-volume-mute"></i>
-            </button>
-            <select name="kick-select" id="kick-select">
-              <option value="./sounds/kick-classic.wav">Classic Kick</option>
-              <option value="./sounds/kick-808.wav">808 Kick</option>
-              <option value="./sounds/kick-heavy.wav">Kick Heavy</option>
-              <option value="./sounds/kick-softy.wav">Kick Softy</option>
-            </select>
-          </div>
-          <div className="kick">
-            {PADS.map((i) => (
-              <div key={i} className={`pad kick-pad b${i}`}></div>
-            ))}
-          </div>
-        </div>
+        <Track
+          title="Kick"
+          trackName="kick"
+          trackIndex={0}
+          options={KICK_OPTIONS}
+          pads={kickPads}
+          onTogglePad={togglePad}
+        />
 
-        <div className="snare-track">
-          <div className="controls">
-            <h1>Snare</h1>
-            <button data-track="1" className="mute snare-volume">
-              <i className="fas fa-volume-mute"></i>
-            </button>
-            <select name="snare-select" id="snare-select">
-              <option value="./sounds/snare-acoustic01.wav">
-                Classic Snare
-              </option>
-              <option value="./sounds/snare-808.wav">808 Snare</option>
-              <option value="./sounds/snare-vinyl02.wav">Snare Vinyl</option>
-            </select>
-          </div>
-          <div className="snare">
-            {PADS.map((i) => (
-              <div key={i} className={`pad snare-pad b${i}`}></div>
-            ))}
-          </div>
-        </div>
+        <Track
+          title="Snare"
+          trackName="snare"
+          trackIndex={1}
+          options={SNARE_OPTIONS}
+          pads={snarePads}
+          onTogglePad={togglePad}
+        />
 
-        <div className="hihat-track">
-          <div className="controls">
-            <h1>Hihat</h1>
-            <button data-track="2" className="mute hihat-volume">
-              <i className="fas fa-volume-mute"></i>
-            </button>
-            <select name="hihat-select" id="hihat-select">
-              <option value="./sounds/hihat-acoustic01.wav">
-                Hihat Acoustic
-              </option>
-              <option value="./sounds/hihat-808.wav">808 Hihat</option>
-            </select>
-          </div>
-          <div className="hihat">
-            {PADS.map((i) => (
-              <div key={i} className={`pad hihat-pad b${i}`}></div>
-            ))}
-          </div>
-        </div>
+        <Track
+          title="Hihat"
+          trackName="hihat"
+          trackIndex={2}
+          options={HIHAT_OPTIONS}
+          pads={hihatPads}
+          onTogglePad={togglePad}
+        />
 
         <button className="play">Play</button>
 
@@ -92,6 +87,7 @@ function App() {
         </div>
       </div>
 
+      {/* TODO (Step 2): Attach ref={...} and dynamic src={...} to each <audio> element */}
       <audio className="kick-sound" src="./sounds/kick-classic.wav"></audio>
       <audio
         className="snare-sound"

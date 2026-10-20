@@ -1,8 +1,21 @@
-// TODO (Step 1): Accept props ({ trackName, index, isActive, isAnimating, onToggle, onAnimationEnd })
-// and render a single pad <div> with dynamic className and click handler.
-
-function Pad() {
-  return <div className="pad"></div>;
+function Pad({
+  trackName,
+  index,
+  isActive,
+  isAnimating,
+  onToggle,
+  onAnimationEnd,
+}) {
+  return (
+    <div
+      className={`pad ${trackName}-pad b${index}${isActive ? " active" : ""}`}
+      style={{
+        animation: isAnimating ? "playTrack 0.3s alternate ease-in-out 2" : "",
+      }}
+      onClick={() => onToggle(trackName, index)}
+      onAnimationEnd={() => onAnimationEnd && onAnimationEnd(trackName, index)}
+    ></div>
+  );
 }
 
 export default Pad;
