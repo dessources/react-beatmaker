@@ -29,7 +29,8 @@ function App() {
   const [hihatSound, setHihatSound] = useState("./sounds/hihat-acoustic01.wav");
 
   const [muted, setMuted] = useState([false, false, false]);
-  // TODO (Step 4): Add `bpm` state (150) and `tempoText` state (150) for the tempo slider
+  const [bpm, setBpm] = useState(150);
+  const [tempoText, setTempoText] = useState(150);
   const [isPlaying, setIsPlaying] = useState(false);
   const [animatingPads, setAnimatingPads] = useState({
     kick: Array(8).fill(false),
@@ -50,8 +51,7 @@ function App() {
   useEffect(() => {
     if (!isPlaying) return;
 
-    // TODO (Step 4): Replace hardcoded `150` with `bpm` state and include `bpm` in the dependency array
-    const interval = (60 / 150) * 1000;
+    const interval = (60 / bpm) * 1000;
     const timer = setInterval(() => {
       const step = indexRef.current % 8;
       const { kickPads: kp, snarePads: sp, hihatPads: hp } = stateRef.current;
@@ -83,7 +83,7 @@ function App() {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [isPlaying]);
+  }, [isPlaying, bpm]);
 
   const togglePad = (track, index) => {
     if (track === "kick") {
@@ -185,17 +185,20 @@ function App() {
           {isPlaying ? "Stop" : "Play"}
         </button>
 
-        {/* TODO (Step 4): Wire up the range input with value={tempoText}, onChange to update tempoText, and onMouseUp/onTouchEnd/onKeyUp to update bpm */}
         <div className="tempo">
           <input
             type="range"
             className="tempo-slider"
             max="300"
             min="20"
-            defaultValue="150"
+            value={tempoText}
+            onChange={(e) => setTempoText(e.target.value)}
+            onMouseUp={(e) => setBpm(e.target.value)}
+            onTouchEnd={(e) => setBpm(e.target.value)}
+            onKeyUp={(e) => setBpm(e.target.value)}
           />
           <p>
-            Tempo: <span className="tempo-nr">150</span>
+            Tempo: <span className="tempo-nr">{tempoText}</span>
           </p>
         </div>
       </div>
