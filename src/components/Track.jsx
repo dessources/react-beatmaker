@@ -13,7 +13,8 @@ function Track({
   onChangeSound,
   isMuted,
   onToggleMute,
-  // TODO (Step 3): Accept animatingPads and onClearAnimation
+  animatingPads,
+  onClearAnimation,
 }) {
   return (
     <div className={`${trackName}-track`}>
@@ -46,8 +47,9 @@ function Track({
             trackName={trackName}
             index={i}
             isActive={pads[i]}
+            isAnimating={animatingPads[i]}
             onToggle={onTogglePad}
-            // TODO (Step 3): Pass isAnimating={animatingPads[i]} and onAnimationEnd={onClearAnimation}
+            onAnimationEnd={onClearAnimation}
           />
         ))}
       </div>

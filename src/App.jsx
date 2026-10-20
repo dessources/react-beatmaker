@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Track from "./components/Track";
 
 const KICK_OPTIONS = [
@@ -29,19 +29,61 @@ function App() {
   const [hihatSound, setHihatSound] = useState("./sounds/hihat-acoustic01.wav");
 
   const [muted, setMuted] = useState([false, false, false]);
-
-  // TODO (Step 3): Add `isPlaying` state (boolean) and `animatingPads` state ({ kick, snare, hihat } arrays)
+  // TODO (Step 4): Add `bpm` state (150) and `tempoText` state (150) for the tempo slider
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [animatingPads, setAnimatingPads] = useState({
+    kick: Array(8).fill(false),
+    snare: Array(8).fill(false),
+    hihat: Array(8).fill(false),
+  });
 
   const kickAudioRef = useRef(null);
   const snareAudioRef = useRef(null);
   const hihatAudioRef = useRef(null);
+  const indexRef = useRef(0);
 
-  // TODO (Step 3): Add `indexRef = useRef(0)` to track the current 0..7 step across interval ticks
-  // TODO (Step 3): Add a `useEffect` that runs a `setInterval` when `isPlaying` is true:
-  //   - Calculate `step = indexRef.current % 8`
-  //   - Trigger the `playTrack` animation for `step` on all three tracks
-  //   - If a track's pad at `step` is active, reset `audioRef.current.currentTime = 0` and call `.play()`
-  //   - Increment `indexRef.current`
+  const stateRef = useRef({ kickPads, snarePads, hihatPads });
+  useEffect(() => {
+    stateRef.current = { kickPads, snarePads, hihatPads };
+  }, [kickPads, snarePads, hihatPads]);
+
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    // TODO (Step 4): Replace hardcoded `150` with `bpm` state and include `bpm` in the dependency array
+    const interval = (60 / 150) * 1000;
+    const timer = setInterval(() => {
+      const step = indexRef.current % 8;
+      const { kickPads: kp, snarePads: sp, hihatPads: hp } = stateRef.current;
+
+      setAnimatingPads((prev) => {
+        const kick = [...prev.kick];
+        const snare = [...prev.snare];
+        const hihat = [...prev.hihat];
+        kick[step] = true;
+        snare[step] = true;
+        hihat[step] = true;
+        return { kick, snare, hihat };
+      });
+
+      if (kp[step] && kickAudioRef.current) {
+        kickAudioRef.current.currentTime = 0;
+        kickAudioRef.current.play();
+      }
+      if (sp[step] && snareAudioRef.current) {
+        snareAudioRef.current.currentTime = 0;
+        snareAudioRef.current.play();
+      }
+      if (hp[step] && hihatAudioRef.current) {
+        hihatAudioRef.current.currentTime = 0;
+        hihatAudioRef.current.play();
+      }
+
+      indexRef.current += 1;
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [isPlaying]);
 
   const togglePad = (track, index) => {
     if (track === "kick") {
@@ -53,7 +95,13 @@ function App() {
     }
   };
 
-  // TODO (Step 3): Write `clearPadAnimation(track, index)` to reset animation state when `onAnimationEnd` fires
+  const clearPadAnimation = (track, index) => {
+    setAnimatingPads((prev) => {
+      const updated = [...prev[track]];
+      updated[index] = false;
+      return { ...prev, [track]: updated };
+    });
+  };
 
   const handleMute = (trackIndex) => {
     setMuted((prev) => {
@@ -96,6 +144,8 @@ function App() {
           onChangeSound={handleChangeSound}
           isMuted={muted[0]}
           onToggleMute={handleMute}
+          animatingPads={animatingPads.kick}
+          onClearAnimation={clearPadAnimation}
         />
 
         <Track
@@ -109,6 +159,8 @@ function App() {
           onChangeSound={handleChangeSound}
           isMuted={muted[1]}
           onToggleMute={handleMute}
+          animatingPads={animatingPads.snare}
+          onClearAnimation={clearPadAnimation}
         />
 
         <Track
@@ -122,11 +174,18 @@ function App() {
           onChangeSound={handleChangeSound}
           isMuted={muted[2]}
           onToggleMute={handleMute}
+          animatingPads={animatingPads.hihat}
+          onClearAnimation={clearPadAnimation}
         />
 
-        {/* TODO (Step 3): Toggle `isPlaying` onClick, add `active` class when playing, and switch text between "Stop" and "Play" */}
-        <button className="play">Play</button>
+        <button
+          className={`play${isPlaying ? " active" : ""}`}
+          onClick={() => setIsPlaying((prev) => !prev)}
+        >
+          {isPlaying ? "Stop" : "Play"}
+        </button>
 
+        {/* TODO (Step 4): Wire up the range input with value={tempoText}, onChange to update tempoText, and onMouseUp/onTouchEnd/onKeyUp to update bpm */}
         <div className="tempo">
           <input
             type="range"
