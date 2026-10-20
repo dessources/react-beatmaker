@@ -9,19 +9,29 @@ function Track({
   options,
   pads,
   onTogglePad,
-  // TODO (Step 2): Accept soundValue, onChangeSound, isMuted, onToggleMute
-  // TODO (Step 3): Accept animatingPads, onClearAnimation
+  soundValue,
+  onChangeSound,
+  isMuted,
+  onToggleMute,
+  // TODO (Step 3): Accept animatingPads and onClearAnimation
 }) {
   return (
     <div className={`${trackName}-track`}>
       <div className="controls">
         <h1>{title}</h1>
-        {/* TODO (Step 2): Add `active` class when isMuted is true, and wire onClick to onToggleMute(trackIndex) */}
-        <button data-track={trackIndex} className={`mute ${trackName}-volume`}>
+        <button
+          data-track={trackIndex}
+          className={`mute ${trackName}-volume${isMuted ? " active" : ""}`}
+          onClick={() => onToggleMute(trackIndex)}
+        >
           <i className="fas fa-volume-mute"></i>
         </button>
-        {/* TODO (Step 2): Make <select> a controlled input with value={soundValue} and onChange={onChangeSound} */}
-        <select name={`${trackName}-select`} id={`${trackName}-select`}>
+        <select
+          name={`${trackName}-select`}
+          id={`${trackName}-select`}
+          value={soundValue}
+          onChange={onChangeSound}
+        >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
