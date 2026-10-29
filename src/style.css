@@ -14,11 +14,18 @@ svg {
 
 .kick-pad,
 .snare-pad,
-.hihat-pad {
-  width: 5rem;
-  height: 5rem;
-  margin: 1rem 0.5rem;
+.hihat-pad,
+.synth-pad {
+  width: 3.2rem;
+  height: 3.8rem;
+  margin: 0.5rem 0.25rem;
   cursor: pointer;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  position: relative;
 }
 .kick-pad {
   background: rgb(160, 211, 224);
@@ -29,6 +36,9 @@ svg {
 .hihat-pad {
   background: rgb(224, 194, 160);
 }
+.synth-pad {
+  background: rgb(168, 224, 186);
+}
 .kick-pad.active {
   background: rgb(59, 197, 231);
 }
@@ -38,6 +48,20 @@ svg {
 .hihat-pad.active {
   background: rgb(241, 158, 64);
 }
+.synth-pad.active {
+  background: rgb(46, 204, 113);
+  color: white;
+  font-weight: bold;
+}
+.synth-pad.selected {
+  outline: 3px solid rgb(30, 30, 30);
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.8);
+  transform: translateY(-2px);
+}
+.pad-note-label {
+  font-size: 0.75rem;
+  pointer-events: none;
+}
 
 .sequencer {
   display: flex;
@@ -45,28 +69,44 @@ svg {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 2rem 1rem;
+  transition: padding-bottom 0.3s ease;
+}
+.sequencer.composing-open {
+  padding-bottom: 18rem;
 }
 
 .hihat-track,
 .snare-track,
-.kick-track {
+.kick-track,
+.synth-track {
   display: flex;
   align-items: center;
-  width: 70%;
+  width: 92%;
+  max-width: 1280px;
   justify-content: space-between;
-  margin-top: 5rem;
+  margin-top: 2.5rem;
 }
 .kick,
 .snare,
-.hihat {
+.hihat,
+.synth {
   display: flex;
+  flex-wrap: nowrap;
 }
 .controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex: 1;
-  margin: 0rem 2rem;
+  margin: 0rem 1.5rem 0rem 0rem;
+  min-width: 240px;
+}
+.track-title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
 }
 .controls button {
   padding: 1rem;
@@ -77,9 +117,19 @@ svg {
   cursor: pointer;
   transition: all 0.5s ease;
 }
+.controls button.compose-btn {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 0.25rem;
+  background: rgb(46, 150, 90);
+}
+.controls button.compose-btn:hover,
+.controls button.compose-btn.active {
+  background: rgb(33, 115, 68);
+}
 
 .pad {
-  transition: all 0.5s ease;
+  transition: all 0.3s ease;
 }
 
 .play {
@@ -89,12 +139,12 @@ svg {
   color: white;
   border: none;
   cursor: pointer;
-  margin-top: 3rem;
+  margin-top: 2.5rem;
 }
 
 select {
-  padding: 1rem;
-  font-size: 1rem;
+  padding: 0.8rem;
+  font-size: 0.95rem;
 }
 
 .mute.active {
@@ -102,7 +152,7 @@ select {
 }
 
 .tempo {
-  margin: 3rem;
+  margin: 2rem;
   width: 30%;
 }
 .tempo-slider {
@@ -117,8 +167,148 @@ select {
 }
 .tempo p {
   font-size: 1.5rem;
-  margin: 2rem;
+  margin: 1rem;
   text-align: center;
+}
+
+/* Piano Keyboard Overlay */
+.piano-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgb(34, 34, 34);
+  color: white;
+  padding: 1rem 2rem 1.5rem;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+  animation: slideUpPiano 0.25s ease-out;
+}
+
+@keyframes slideUpPiano {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.piano-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.piano-instructions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+}
+
+.piano-badge {
+  background: rgb(58, 58, 58);
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+
+.piano-current-note {
+  color: rgb(168, 224, 186);
+}
+
+.piano-clear-btn {
+  background: rgb(180, 65, 65);
+  color: white;
+  border: none;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.piano-clear-btn:hover {
+  background: rgb(210, 75, 75);
+}
+
+.piano-close {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: background 0.2s ease;
+}
+.piano-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.piano-keys {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  height: 10.5rem;
+  user-select: none;
+}
+
+.piano-key {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: background 0.1s ease, transform 0.05s ease;
+}
+
+.piano-key.white-key {
+  width: 3.4rem;
+  height: 10.5rem;
+  background: white;
+  color: rgb(50, 50, 50);
+  border: 1px solid rgb(180, 180, 180);
+  border-radius: 0 0 0.35rem 0.35rem;
+  z-index: 1;
+}
+.piano-key.white-key:hover {
+  background: rgb(235, 248, 240);
+}
+.piano-key.white-key:active {
+  transform: translateY(2px);
+}
+.piano-key.white-key.assigned {
+  background: rgb(46, 204, 113);
+  color: white;
+}
+
+.piano-key.black-key {
+  width: 2.2rem;
+  height: 6.5rem;
+  background: rgb(25, 25, 25);
+  color: rgb(210, 210, 210);
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 0 0 0.25rem 0.25rem;
+  margin-left: -1.1rem;
+  margin-right: -1.1rem;
+  z-index: 2;
+  font-size: 0.65rem;
+}
+.piano-key.black-key:hover {
+  background: rgb(55, 55, 55);
+}
+.piano-key.black-key:active {
+  transform: translateY(2px);
+}
+.piano-key.black-key.assigned {
+  background: rgb(33, 160, 88);
+  color: white;
 }
 
 @keyframes playTrack {
